@@ -1,0 +1,33 @@
+name: Send Email
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Start Server
+        run: node server.js &
+
+      - name: Send Test Email
+        run: |
+          sleep 5
+          curl -X POST -H "Content-Type: application/json" -d '{"to": "recipient@example.com", "subject": "Test Subject", "text": "Test Message"}' http://localhost:3000/send-email
+        env:
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+
